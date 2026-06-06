@@ -1,7 +1,7 @@
 use crate::{
-    hittable::{HitRecord, Hittable},
-    ray::Ray,
-    vec3::Vec3,
+    math::ray::Ray,
+    math::vec3::Vec3,
+    objects::hittable::{HitRecord, Hittable},
 };
 
 pub struct Sphere {
