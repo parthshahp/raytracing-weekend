@@ -3,36 +3,43 @@ use std::{
     ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub},
 };
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Vec3 {
     pub e: [f64; 3],
 }
 
 impl Vec3 {
+    #[must_use]
     pub fn new() -> Self {
-        Vec3 { e: [0.0, 0.0, 0.0] }
+        Self::default()
     }
 
+    #[must_use]
     pub fn from(e0: f64, e1: f64, e2: f64) -> Self {
         Vec3 { e: [e0, e1, e2] }
     }
 
+    #[must_use]
     pub fn x(&self) -> f64 {
         self.e[0]
     }
 
+    #[must_use]
     pub fn y(&self) -> f64 {
         self.e[1]
     }
 
+    #[must_use]
     pub fn z(&self) -> f64 {
         self.e[2]
     }
 
+    #[must_use]
     fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
 
+    #[must_use]
     pub fn length_squared(&self) -> f64 {
         self.x() * self.x() + self.y() * self.y() + self.z() * self.z()
     }
@@ -130,10 +137,12 @@ impl Div<f64> for Vec3 {
     }
 }
 
+#[must_use]
 pub fn dot(u: Vec3, v: Vec3) -> f64 {
     u.e[0] * v.e[0] + u.e[1] * v.e[1] + u.e[2] * v.e[2]
 }
 
+#[must_use]
 pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
     Vec3::from(
         u.e[1] * v.e[2] - u.e[2] * v.e[1],
@@ -142,6 +151,7 @@ pub fn cross(u: Vec3, v: Vec3) -> Vec3 {
     )
 }
 
+#[must_use]
 pub fn unit_vector(v: Vec3) -> Vec3 {
     v / v.length()
 }
