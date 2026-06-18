@@ -1,0 +1,6 @@
+[tools]
+rust = "latest"
+
+[tasks.run]
+description = "Build and run, outputting to image.ppm"
+run = "cargo run > image.ppm"
