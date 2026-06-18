@@ -10,10 +10,7 @@ use crate::render::color::Color;
 
 #[must_use]
 pub fn ray_color(r: &Ray) -> Vec3 {
-    let sphere = Sphere {
-        center: Vec3::from(0.0, 0.0, -1.0),
-        radius: 0.5,
-    };
+    let sphere = Sphere::new(Vec3::from(0.0, 0.0, -1.0), 0.5);
 
     let mut rec = HitRecord {
         p: Vec3::from(0.0, 0.0, 0.0),
