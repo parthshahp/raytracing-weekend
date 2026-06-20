@@ -1,7 +1,7 @@
 use raytracing_weekend::math::ray::Ray;
 use raytracing_weekend::math::vec3::Vec3;
-use raytracing_weekend::render::color::write_color;
 use raytracing_weekend::ray_color;
+use raytracing_weekend::render::color::write_color;
 
 fn main() {
     tracing_subscriber::fmt()
