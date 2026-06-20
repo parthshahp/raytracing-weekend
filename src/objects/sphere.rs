@@ -22,7 +22,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> Option<HitRecord> {
         let oc = self.center - r.origin();
         // A vector dotted with itself == squared length
         let a = r.direction().length_squared();
@@ -32,7 +32,7 @@ impl Hittable for Sphere {
 
         // No roots exist, no hits
         if discriminant < 0.0 {
-            return false;
+            return None;
         }
 
         // Solve for t
@@ -44,16 +44,28 @@ impl Hittable for Sphere {
         if root <= ray_tmin || ray_tmax <= root {
             root = (h + sqrtd) / a;
             if root <= ray_tmin || ray_tmax <= root {
-                return false;
+                return None;
             }
         }
 
-        rec.t = root;
-        rec.p = r.at(rec.t);
-        // Set normal to always face outward
-        let outward_normal = (rec.p - self.center) / self.radius;
-        rec.set_face_normal(r, &outward_normal);
+        // Break from the book:
+        // since this was the only call site, simpler to just inline here
+        let point = r.at(root);
+        let outward_normal = (point - self.center) / self.radius;
+        // TODO: replace it in the HitRecord constructor to streamline logic
+        // Something like `fn from_hit(ray, vec3, outward_normal, t) -> HitRecord`
+        let front_face = dot(r.direction(), outward_normal) < 0.0;
+        let normal = if front_face {
+            outward_normal
+        } else {
+            -outward_normal
+        };
 
-        true
+        Some(HitRecord {
+            p: point,
+            normal,
+            t: root,
+            front_face,
+        })
     }
 }
