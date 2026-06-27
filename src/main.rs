@@ -1,5 +1,9 @@
+use std::rc::Rc;
+
 use raytracing_weekend::math::ray::Ray;
-use raytracing_weekend::math::vec3::Vec3;
+use raytracing_weekend::math::vec3::{self, Vec3};
+use raytracing_weekend::objects::hittable_list::HittableList;
+use raytracing_weekend::objects::sphere::Sphere;
 use raytracing_weekend::ray_color;
 use raytracing_weekend::render::color::write_color;
 
@@ -14,6 +18,12 @@ fn main() {
     #[allow(clippy::cast_possible_truncation)]
     #[allow(clippy::cast_sign_loss)]
     let image_height = ((f64::from(image_width) / aspect_ratio) as u32).max(1);
+
+    // World
+    let mut world = HittableList::new();
+    // We are adding two spheres here: the multi-colored one and the plain green one
+    world.add(Rc::new(Sphere::new(Vec3::from(0.0, 0.0, -1.0), 0.5)));
+    world.add(Rc::new(Sphere::new(Vec3::from(0.0, -100.5, -1.0), 100.0)));
 
     // Camera
     let focal_length = 1.0;
@@ -46,7 +56,7 @@ fn main() {
                 pixel00_loc + (f64::from(i) * pixel_delta_u) + (f64::from(j) * pixel_delta_v);
             let ray_direction = pixel_center - camera_center;
             let r = Ray::new(camera_center, ray_direction);
-            let pixel_color = ray_color(&r);
+            let pixel_color = ray_color(&r, &world);
 
             println!("{}", write_color(pixel_color));
         }
