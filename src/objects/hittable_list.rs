@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    math::ray::Ray,
+    math::{interval::Interval, ray::Ray},
     objects::hittable::{HitRecord, Hittable},
 };
 
@@ -38,13 +38,13 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &Ray, ray_tmin: f64, ray_tmax: f64) -> Option<HitRecord> {
-        let mut closest_so_far = ray_tmax;
+    fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord> {
+        let mut closest_so_far = ray_t.max;
         let mut ret = None;
 
         // What is the closest object hit in the list?
         for obj in &self.objects {
-            if let Some(hit_record) = obj.hit(r, ray_tmin, closest_so_far) {
+            if let Some(hit_record) = obj.hit(r, Interval::new(ray_t.min, closest_so_far)) {
                 closest_so_far = hit_record.t;
                 ret = Some(hit_record);
             }
