@@ -1,23 +1,14 @@
 use std::rc::Rc;
 
-use raytracing_weekend::math::ray::Ray;
-use raytracing_weekend::math::vec3::{self, Vec3};
+use raytracing_weekend::math::vec3::Vec3;
 use raytracing_weekend::objects::hittable_list::HittableList;
 use raytracing_weekend::objects::sphere::Sphere;
-use raytracing_weekend::ray_color;
-use raytracing_weekend::render::color::write_color;
+use raytracing_weekend::render::camera::Camera;
 
 fn main() {
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
         .init();
-
-    // Image
-    let aspect_ratio = 16.0 / 9.0;
-    let image_width = 400;
-    #[allow(clippy::cast_possible_truncation)]
-    #[allow(clippy::cast_sign_loss)]
-    let image_height = ((f64::from(image_width) / aspect_ratio) as u32).max(1);
 
     // World
     let mut world = HittableList::new();
@@ -26,40 +17,10 @@ fn main() {
     world.add(Rc::new(Sphere::new(Vec3::from(0.0, -100.5, -1.0), 100.0)));
 
     // Camera
-    let focal_length = 1.0;
-    let viewport_height = 2.0;
-    let viewport_width = viewport_height * (f64::from(image_width) / f64::from(image_height));
-    let camera_center = Vec3::new();
+    let mut cam = Camera::default();
+    cam.aspect_ratio = 16.0 / 9.0;
+    cam.image_width = 400;
+    cam.render(&world);
 
-    // Calculate the vectors across the horizontal and down the vertical viewport edges.
-    let viewport_u = Vec3::from(viewport_width, 0.0, 0.0);
-    let viewport_v = Vec3::from(0.0, -viewport_height, 0.0);
-
-    // Calculate the horizontal and vertical delta vectors from pixel to pixel.
-    let pixel_delta_u = viewport_u / f64::from(image_width);
-    let pixel_delta_v = viewport_v / f64::from(image_height);
-
-    // Calculate the location of the upper left pixel.
-    let viewport_upper_left =
-        camera_center - Vec3::from(0.0, 0.0, focal_length) - viewport_u / 2.0 - viewport_v / 2.0;
-    let pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
-
-    // Render
-    println!("P3");
-    println!("{image_width} {image_height}");
-    println!("255");
-
-    for j in 0..image_height {
-        tracing::info!("\rScanlines Remaining: {} ", image_height - j);
-        for i in 0..image_width {
-            let pixel_center =
-                pixel00_loc + (f64::from(i) * pixel_delta_u) + (f64::from(j) * pixel_delta_v);
-            let ray_direction = pixel_center - camera_center;
-            let r = Ray::new(camera_center, ray_direction);
-            let pixel_color = ray_color(&r, &world);
-
-            println!("{}", write_color(pixel_color));
-        }
-    }
     tracing::info!("\rDone.\n");
 }
