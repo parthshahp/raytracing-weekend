@@ -1,9 +1,13 @@
 use std::rc::Rc;
 
-use raytracing_weekend::math::vec3::Vec3;
-use raytracing_weekend::objects::hittable_list::HittableList;
-use raytracing_weekend::objects::sphere::Sphere;
-use raytracing_weekend::render::camera::Camera;
+mod math;
+mod objects;
+mod render;
+
+use crate::math::vec3::Vec3;
+use crate::objects::hittable_list::HittableList;
+use crate::objects::sphere::Sphere;
+use crate::render::camera::Camera;
 
 fn main() {
     tracing_subscriber::fmt()

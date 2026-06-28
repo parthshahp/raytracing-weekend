@@ -1,3 +1,5 @@
+use rand::{Rng, RngExt};
+
 use crate::{
     math::{
         interval::Interval,
@@ -5,7 +7,6 @@ use crate::{
         vec3::{Vec3, unit_vector},
     },
     objects::hittable::Hittable,
-    ray_color,
     render::color::{Color, write_color},
 };
 
@@ -46,20 +47,15 @@ impl Camera {
         println!("{} {}", self.image_width, self.image_height);
         println!("255");
 
+        let mut rng = rand::rng();
+
         for j in 0..self.image_height {
             tracing::info!("\rScanlines Remaining: {} ", self.image_height - j);
             for i in 0..self.image_width {
-                // let pixel_center = self.pixel00_loc
-                //     + (f64::from(i) * self.pixel_delta_u)
-                //     + (f64::from(j) * self.pixel_delta_v);
-                // let ray_direction = pixel_center - self.center;
-                // let r = Ray::new(self.center, ray_direction);
-                // let pixel_color = Camera::ray_color(&r, world);
-
                 let mut pixel_color = Color::from(0.0, 0.0, 0.0);
                 for _sample in 0..self.samples_per_pixel {
-                    let r = self.get_ray(i, j);
-                    pixel_color += ray_color(&r, world);
+                    let r = self.get_ray(i, j, &mut rng);
+                    pixel_color += Camera::ray_color(&r, world);
                 }
                 println!("{}", write_color(pixel_color * self.pixel_samples_scale));
             }
@@ -91,19 +87,14 @@ impl Camera {
         self.pixel00_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
     }
 
-    fn get_ray(&self, i: u32, j: u32) -> Ray {
+    fn get_ray(&self, i: u32, j: u32, rng: &mut impl Rng) -> Ray {
         // Construct a camera ray originating from the origin and directed at randomly sampled
         // point around the pixel location i, j.
 
-        let offset = Camera::sample_square();
+        let offset = Camera::sample_square(rng);
         let pixel_sample = self.pixel00_loc
             + ((f64::from(i) + offset.x()) * self.pixel_delta_u)
             + ((f64::from(j) + offset.y()) * self.pixel_delta_v);
-
-        // auto ray_origin = center;
-        // auto ray_direction = pixel_sample - ray_origin;
-        //
-        // return ray(ray_origin, ray_direction);
 
         let ray_origin = self.center;
         let ray_direction = pixel_sample - ray_origin;
@@ -122,11 +113,11 @@ impl Camera {
         (1.0 - a) * Color::from(1.0, 1.0, 1.0) + a * Color::from(0.5, 0.7, 1.0)
     }
 
-    fn sample_square() -> Vec3 {
+    fn sample_square(rng: &mut impl Rng) -> Vec3 {
         // Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
         // TODO: Make this nicer
-        let x: f64 = rand::random();
-        let y: f64 = rand::random();
+        let x: f64 = rng.random();
+        let y: f64 = rng.random();
         Vec3::from(x - 0.5, y - 0.5, 0.0)
     }
 }
