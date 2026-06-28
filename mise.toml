@@ -1,6 +1,10 @@
 [tools]
 rust = "latest"
 
-[tasks.run]
+[tasks.dev]
 description = "Build and run, outputting to image.ppm"
 run = "cargo run > image.ppm"
+
+[tasks.release]
+description = "Compile and run, outputting to image.ppm"
+run = "cargo build --release && ./target/release/raytracing-weekend > image.ppm"
