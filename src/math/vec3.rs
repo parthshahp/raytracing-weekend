@@ -46,6 +46,12 @@ impl Vec3 {
     }
 
     #[must_use]
+    pub fn near_zero(&self) -> bool {
+        let s = 1e-8;
+        self.e.iter().all(|&x| x.abs() < s)
+    }
+
+    #[must_use]
     pub fn random() -> Vec3 {
         let mut rng = rand::rng();
         let x: f64 = rng.random();
