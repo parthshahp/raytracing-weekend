@@ -4,7 +4,7 @@ use crate::{
     math::{
         interval::Interval,
         ray::Ray,
-        vec3::{Vec3, random_on_hemisphere, unit_vector},
+        vec3::{Vec3, random_unit_vector, unit_vector},
     },
     objects::hittable::Hittable,
     render::color::{Color, write_color},
@@ -109,9 +109,8 @@ impl Camera {
         }
         // If anything in the world is hit, return the "correct" color
         if let Some(rec) = world.hit(r, Interval::new(0.001, f64::INFINITY)) {
-            let direction = random_on_hemisphere(&rec.normal);
-            return 0.5 * Self::ray_color(&Ray::new(rec.p, direction), max_depth - 1, world);
-            // return 0.5 * (rec.normal + Color::from(1.0, 1.0, 1.0));
+            let direction = random_unit_vector() + rec.normal;
+            return 0.1 * Self::ray_color(&Ray::new(rec.p, direction), max_depth - 1, world);
         }
 
         let unit_direction = unit_vector(r.direction());

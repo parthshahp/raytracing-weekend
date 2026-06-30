@@ -175,7 +175,7 @@ pub fn unit_vector(v: Vec3) -> Vec3 {
     v / v.length()
 }
 
-fn random_unit_vector() -> Vec3 {
+pub fn random_unit_vector() -> Vec3 {
     loop {
         let p = Vec3::random_clamp(-1.0, 1.0);
         let lensq = p.length_squared();
