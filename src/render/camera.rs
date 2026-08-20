@@ -109,8 +109,14 @@ impl Camera {
         }
         // If anything in the world is hit, return the "correct" color
         if let Some(rec) = world.hit(r, Interval::new(0.001, f64::INFINITY)) {
-            let direction = random_unit_vector() + rec.normal;
-            return 0.1 * Self::ray_color(&Ray::new(rec.p, direction), max_depth - 1, world);
+            // let direction = random_unit_vector() + rec.normal;
+            // return 0.1 * Self::ray_color(&Ray::new(rec.p, direction), max_depth - 1, world);
+
+            if let Some((attenuation, scattered)) = rec.mat.scatter(r, &rec) {
+                return attenuation * Self::ray_color(&scattered, max_depth - 1, world);
+            }
+
+            return Color::from(0.0, 0.0, 0.0);
         }
 
         let unit_direction = unit_vector(r.direction());

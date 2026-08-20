@@ -1,5 +1,8 @@
 use crate::{
-    math::{ray::Ray, vec3::random_unit_vector},
+    math::{
+        ray::Ray,
+        vec3::{random_unit_vector, reflect},
+    },
     objects::hittable::HitRecord,
     render::color::Color,
 };
@@ -9,7 +12,7 @@ pub trait Material {
 }
 
 pub struct Lambertian {
-    albedo: Color,
+    pub albedo: Color,
 }
 
 impl Material for Lambertian {
@@ -23,6 +26,21 @@ impl Material for Lambertian {
 
         let scattered = Ray::new(rec.p, scatter_direction);
         let attenuation = self.albedo;
+
+        Some((attenuation, scattered))
+    }
+}
+
+pub struct Metal {
+    pub albedo: Color,
+}
+
+impl Material for Metal {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<(Color, Ray)> {
+        let reflected = reflect(&r_in.direction(), &rec.normal);
+        let scattered = Ray::new(rec.p, reflected);
+        let attenuation = self.albedo;
+
         Some((attenuation, scattered))
     }
 }

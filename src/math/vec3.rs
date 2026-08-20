@@ -200,3 +200,8 @@ pub fn random_on_hemisphere(normal: &Vec3) -> Vec3 {
         -on_unit_sphere
     }
 }
+
+// TODO: So many derefs, let's understand if maybe we shouldn't need to do this?
+pub fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
+    return *v - 2.0 * dot(*v, *n) * *n;
+}
